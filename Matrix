@@ -1,0 +1,58 @@
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+# Contoh data
+data = {
+    'text': [
+        'Saya sangat senang hari ini!',
+        'Hari ini sangat buruk.',
+        'Saya merasa lonely.',
+        'Ini adalah hari yang luar biasa.',
+        'Saya marah karena terlambat.',
+        'Sangat menyenangkan!',
+        'Saya kecewa dengan hasilnya.'
+    ],
+    'emotion': [
+        'senang',
+        'lonely',
+        'lonely',
+        'senang',
+        'marah',
+        'senang',
+        'kecewa'
+    ]
+}
+
+# Membuat DataFrame
+df = pd.DataFrame(data)
+
+# Inisialisasi CountVectorizer
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(df['text'])
+y = df['emotion']
+
+# Membagi data menjadi train dan test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Inisialisasi dan melatih model
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+# Menghitung prediksi
+y_pred = model.predict(X_test)
+
+# Menghitung akurasi
+accuracy = model.score(X_test, y_test)
+print(f'Akurasi model: {accuracy:.2f}')
+# Menghitung confusion matrix
+cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
+
+# Menampilkan confusion matrix
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
+disp.plot(cmap=plt.cm.Blues)
+plt.title('Confusion Matrix')
+plt.show()
